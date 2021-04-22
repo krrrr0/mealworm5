@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="급식봇® 버그 신고하기 메뉴입니다.">
+    <title>급식봇® 버그 신고하기</title>
+
+    <link rel="canonical" href="https://mw.svc.amiya.us/support/bugreport">
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/static/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/favicons/favicon-96x96.png">
+    <link rel="manifest" href="/static/favicons/manifest.json">
+    <meta name="msapplication-TileColor" content="#ec534e">
+    <meta name="msapplication-TileImage" content="/static/favicons/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ec534e">
+
+    <style>
+        body {
+            word-break: keep-all;
+            word-wrap: break-word;
+        }
+
+        /*
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+        .lh-condensed {
+            line-height: 1.25
+        }
+
+        */
+        .container {
+            max-width: 800px;
+        }
+        
+
+    </style>
+
+</head>
+
+<body class="bg-light">
+    <div class="container">
+        <div class="py-5 text-center">
+            <img class="d-block mx-auto mb-4" src="/static/support/banner.png" alt="급식봇® 지원 배너" height="64">
+            <h2>버그 신고하기</h2>
+            <p class="lead">급식봇을 사용해 주셔서 감사합니다. 급식봇을 사용하면서 불편하신 점이나 있었으면 하는 기능, 그리고 오류 등을 신고해 주시는 양식입니다.</p>
+        </div>
+
+        <div class="row">
+            <div class="col order-md-1 container" style="max-width: 720px">
+                <h4 class="mb-3">어떻게 도와 드릴 수 있을까요?</h4>
+                <form class="needs-validation" novalidate method="post">
+                    <div class="mb-3">
+                        <label for="id">사용자 고유 id <span class="text-muted">(자동으로 입력)</span></label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">#</span>
+                            </div>
+                            <input type="text" class="form-control" id="id" name="id" placeholder="" value="{{ id }}" required readonly>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="title">제목 <span class="text-muted">(필수)</span></label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="문제나 건의사항에 대해 간략히 적어주세요. 예) '서울미래중학교' 가 없는 학교로 떠요." value="" required onkeypress="return event.keyCode !== 13;">
+                        <div class="invalid-feedback">
+                            제목은 비어 있을 수 없습니다.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="steps_to_reproduce">버그 발생 과정 / 건의 내용 <span class="text-muted">(필수)</span></label>
+                        <textarea class="form-control" rows="4" id="steps_to_reproduce" name="steps_to_reproduce" placeholder="버그나 건의사항의 자세한 내용을 적어 주세요.&#10;&#10;예) '한양대학교사범대학부속중학교' 말고 '한대부중' 이라고 쳐도 되게 해 주세요." value="" required></textarea>
+                        <div class="invalid-feedback">
+                            버그 발생 과정을 적어주세요.
+                        </div>
+                    </div>
+
+                    <hr class="mb-4">
+                    <h4 class="mb-3">연락드릴 방법을 알려주세요. (선택)</h4>
+
+                    <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="want_contact" name="want_contact">
+                        <label class="custom-control-label" for="want_contact">급식봇 팀으로부터 연락을 받고 싶습니다.</label>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="contact_information">연락처 정보 <span class="text-muted">(선택)</span></label>
+                        <textarea class="form-control" rows="3" id="contact_information" name="contact_information" placeholder="연락받으실 연락처 (이메일, 카카오톡/메신저/텔레그램 등) 을 간단하게 남겨주세요.&#10;연락처 정보는 암호화되어 안전하게 처리되며, 버그 해결 후 영구적으로 삭제됩니다."></textarea>
+                    </div>
+
+                    <hr class="mb-4">
+
+                    <button class="btn btn-primary btn-lg btn-block" type="submit" id="submit">띵동!</button>
+                </form>
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">&copy; dazzle inc. 모든 권리 보유.</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="https://facebook.com/mealworm05">급식봇5 페이스북</a></li>
+                <li class="list-inline-item"><a href="https://github.com/dazzleofficial/mealworm5">Github</a></li>
+            </ul>
+        </footer>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script>
+        window.jQuery || document.write('<script src="/static/support/bugreport/jquery.slim.min.js"><\/script>')
+    </script>
+    <script src="/static/support/bugreport/bootstrap.bundle.min.js"></script>
+    <script src="/static/support/bugreport/form-validation.js"></script>
+</body>
+
+</html>
