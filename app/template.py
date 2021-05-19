@@ -205,7 +205,7 @@ class Templates:
             },
             {
                 'title': '영양소 정보',
-                'image_url': '%rootdir%/static/nutrients.jpg',
+                'image_url': '%rootdir%/static/nutrients.png',
                 'subtitle': '살찔 걱정은 NO! 급식의 영양소 정보를 급식봇에서 볼 수 있어요.',
                 'buttons': [
                     {
