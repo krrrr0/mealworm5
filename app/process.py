@@ -4,6 +4,9 @@ from app.template import Templates
 import datetime
 import pytz
 
+from app.mongodb import MongoController
+db = MongoController()
+
 
 class Processing:
     def __init__(self):
@@ -296,8 +299,6 @@ class Processing:
                 Logger.log('[PS > process_postback] 나이스 재조회중 기타 오류!', 'ERROR', str(e))
                 return user
 
-            from app.mongodb import MongoController
-            db = MongoController()
             db_meal = db.search_meal(school_code, tmp_date, mealtime)
             if db_meal:  # 디비에서 저장된 급식을 가져왔을 때
                 db_meal = db_meal['meal']
@@ -407,8 +408,6 @@ class Processing:
             _, meal_code = payload.split('_')
 
             # 급식 NO. 를 이용해서 급식을 가져온다.
-            from app.mongodb import MongoController
-            db = MongoController()
             db_meal = db.get_meal(meal_code)
             if db_meal:  # 디비에서 저장된 급식을 가져왔을 때
                 nutrition = db_meal['nutrition']   # str
