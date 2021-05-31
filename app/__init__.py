@@ -198,6 +198,7 @@ def webhook():
 
         except Exception as e:
             traceback.print_exc()
+            return {}
 
             try:
                 Logger.log('치명적 오류 발생!! RECIPIENT: {0}'.format(e['sender']['id']), level='ERROR', details=str(e))
