@@ -381,7 +381,7 @@ class Processing:
                         'mealtime': int(mealtime),
                         'nutrition': nutrition
                     }
-
+                    Logger.log(f'call save_meal!', 'INFO')
                     db.save_meal(user, me)
 
                 return user
