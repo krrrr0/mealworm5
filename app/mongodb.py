@@ -85,7 +85,7 @@ class MongoController:
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
             meals = db.meals
-            m = meals.find_one({"meal_id": meal_id})
+            m = meals.find_one({"meal_id": meal['meal_id']})
             if not m:
                 meals.insert_one(meal)
             return True
