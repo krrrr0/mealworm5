@@ -369,7 +369,7 @@ class Processing:
                     quick_replies
                 )
 
-                if db_meal is None:
+                if not db_meal:
                     # FS에 급식을 세이브한다.
                     me = {
                         'meal_id': meal_id,

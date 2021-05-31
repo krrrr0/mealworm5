@@ -111,7 +111,7 @@ def webhook():
                     usr = fs.get_user(e['sender']['id'], g_config)
 
                     # 0-1-1. 신규 유저인 경우
-                    if usr is None:
+                    if not usr:
                         Logger.log('[APP > webhook] UID: {0} 생성합니다...'.format(e['sender']['id']))
                         user_config = {
                             'new_user': True,
