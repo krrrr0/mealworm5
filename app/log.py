@@ -30,9 +30,9 @@ class Logger:
 
     def bugreport(self, uid, title, details, contact):
         try:
-            from app.firestore import FireStoreController
-            fs = FireStoreController()
-            fs.save_bugreport(uid, title, details, contact)
+            from app.mongodb import MongoController
+            db = MongoController()
+            db.save_bugreport(uid, title, details, contact)
         except Exception as e:
             self.log('[Logger > bugreport] 오류!', 'ERROR', str(e))
         return

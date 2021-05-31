@@ -296,20 +296,20 @@ class Processing:
                 Logger.log('[PS > process_postback] 나이스 재조회중 기타 오류!', 'ERROR', str(e))
                 return user
 
-            from app.firestore import FireStoreController
-            fs = FireStoreController()
-            fs_meal = fs.search_meal(school_code, tmp_date, mealtime)
-            if fs_meal is not None:  # 디비에서 저장된 급식을 가져왔을 때
-                meal = fs_meal['meal']
-                meal_id = fs_meal['meal_id']
-                nutrition = fs_meal['nutrition']
+            from app.mongodb import MongoController
+            db = MongoController()
+            db_meal = db.search_meal(school_code, tmp_date, mealtime)
+            if db_meal:  # 디비에서 저장된 급식을 가져왔을 때
+                db_meal = db_meal['meal']
+                meal_id = db_meal['meal_id']
+                nutrition = db_meal['nutrition']
             else:   # 디비에 없을때
                 meal_id = '#{0}{1}'.format(user.uid, user.use_count)
                 try:
-                    meal, nutrition = sch.get_meal(date, int(mealtime))
+                    db_meal, nutrition = sch.get_meal(date, int(mealtime))
                 except TypeError:
                     # 급식이 없음
-                    meal = []
+                    db_meal = []
                     nutrition = None
                 except Exception as e:
                     Logger.log('[PS > process_postback] 급식 조회 중 오류!', 'ERROR', str(e))
@@ -324,9 +324,9 @@ class Processing:
                 mt_text = '점심'
 
             # 잘 포장해서 보낸다
-            if len(meal) != 0:  # 급식이 존재할 때
+            if len(db_meal) != 0:  # 급식이 존재할 때
                 meal_text = ''
-                for menu in meal:
+                for menu in db_meal:
                     meal_text = meal_text + menu + '\n'
                 meal_text = meal_text.rstrip()
 
@@ -368,11 +368,11 @@ class Processing:
                     quick_replies
                 )
 
-                if fs_meal is None:
+                if db_meal is None:
                     # FS에 급식을 세이브한다.
                     me = {
                         'meal_id': meal_id,
-                        'meal': meal,
+                        'meal': db_meal,
                         'school_code': school_code,
                         'school_name': sch.name,
                         'date': tmp_date,
@@ -380,7 +380,7 @@ class Processing:
                         'nutrition': nutrition
                     }
 
-                    fs.save_meal(user, me)
+                    db.save_meal(user, me)
 
                 return user
 
@@ -403,17 +403,17 @@ class Processing:
         # 영양소 정보 보기
         elif payload.startswith('N_'):
             # 파라미터 값을 추출한다.
-            [_, meal_code] = payload.split('_')
+            _, meal_code = payload.split('_')
 
             # 급식 NO. 를 이용해서 급식을 가져온다.
-            from app.firestore import FireStoreController
-            fs = FireStoreController()
-            meal = fs.get_meal(meal_code)
-            if meal is not None:  # 디비에서 저장된 급식을 가져왔을 때
-                nutrition = meal['nutrition']   # str
-                date = meal['date']
-                school_name = meal['school_name']
-                mealtime_hangul = ['아침', '점심', '저녁'][int(meal['mealtime']) - 1]
+            from app.mongodb import MongoController
+            db = MongoController()
+            db_meal = db.get_meal(meal_code)
+            if db_meal:  # 디비에서 저장된 급식을 가져왔을 때
+                nutrition = db_meal['nutrition']   # str
+                date = db_meal['date']
+                school_name = db_meal['school_name']
+                mealtime_hangul = ['아침', '점심', '저녁'][int(db_meal['mealtime']) - 1]
 
                 fm.send(
                     user.uid,

@@ -7,7 +7,7 @@
 
 ## 개요
 급식봇은 자연어 인식 기술을 활용한 인공지능 급식 챗봇입니다!  
-2021년부터 [dazzle inc.](https://github.com/dazzleofficial/) 에서 운영이 이루어지고 있습니다.
+2021년부터 [@dazzleofficial](https://github.com/dazzleofficial/) 에서 운영이 이루어지고 있습니다.
 
 ## 특징
 **급식봇은 자연어 인식 기술을 활용하여 정형화되지 않은 대화에서 사용자의 의도를 추출해 급식을 가져옵니다.**  

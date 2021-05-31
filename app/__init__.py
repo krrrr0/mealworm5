@@ -14,7 +14,7 @@ import requests
 import json
 
 from app.process import Processing
-from app.firestore import FireStoreController
+from app.mongodb import MongoController
 from app.facebook import FacebookMessenger
 from app.log import Logger
 from app.user import User
