@@ -85,9 +85,9 @@ class MongoController:
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
             meals = db.meals
-            m = meals.find_one({"meal_id": meal['meal_id']})
-            if not m:
-                meals.insert_one(meal)
+            # m = meals.find_one({"meal_id": meal['meal_id']})
+            #if not m:
+            meals.insert_one(meal)
             return True
 
         except Exception as e:
@@ -152,7 +152,7 @@ class MongoController:
 
         except Exception as e:
             from app.log import Logger
-            Logger.log('[DB > save_bugreport] 버그 리포트 저장 실패. UID: {0}'.format(user.uid), 'ERROR', str(e))
+            Logger.log('[DB > save_bugreport] 버그 리포트 저장 실패.', 'ERROR', str(e))
             return None
 
         return True
