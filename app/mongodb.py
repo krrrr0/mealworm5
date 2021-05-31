@@ -51,13 +51,26 @@ class MongoController:
     def save_user(user):
         try:
             users = db.users
-            users.insert_one({
-                'uid': user.uid,
-                'name': user.name,
-                'use_count': user.use_count,
-                'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
-                'last_school_code': user.last_school_code
-            })
+            usr = users.find_one({"uid": uid})
+
+            if not usr:
+                users.insert_one({
+                    'uid': user.uid,
+                    'name': user.name,
+                    'use_count': user.use_count,
+                    'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
+                    'last_school_code': user.last_school_code
+                })
+            else:
+                users.replace_one({
+                    'uid': user.uid
+                }, {
+                    'uid': user.uid,
+                    'name': user.name,
+                    'use_count': user.use_count,
+                    'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
+                    'last_school_code': user.last_school_code
+                })
 
         except Exception as e:
             from app.log import Logger
