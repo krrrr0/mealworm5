@@ -105,7 +105,7 @@ def webhook():
                 for e in event['messaging']:
                     # 0. 고스트 확인
                     if e.get('message', {}).get('is_echo'):
-                        continue
+                        break
 
                     # 1. 디비에서 불러오기
                     usr = fs.get_user(e['sender']['id'], g_config)
@@ -135,7 +135,7 @@ def webhook():
                                     'ERROR',
                                     'RECIPIENT: {0}'.format(usr.uid)
                                 )
-                        continue
+                        break
 
                     # 1-2. 메시지 처리
                     elif e.get('message'):
@@ -155,7 +155,7 @@ def webhook():
                                         'ERROR',
                                         'RECIPIENT: {0}'.format(usr.uid)
                                     )
-                                continue
+                                break
 
                         # 1-2-2. 텍스트 메시지 처리
                         if e['message'].get('text'):
@@ -175,11 +175,12 @@ def webhook():
                                     'ERROR',
                                     'RECIPIENT: {0}'.format(usr.uid)
                                 )
-                            continue
+                            break
 
                         # 1-2-3. 첨부파일 등이 있는 메시지
                         if e['message'].get('attachments'):
                             ps.process_postback(usr, 'ATTACHMENTS', g_config)
+                            break
 
                     try:
                         fs.save_user(usr)
