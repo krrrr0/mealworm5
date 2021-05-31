@@ -51,7 +51,7 @@ class MongoController:
     def save_user(user):
         try:
             users = db.users
-            usr = users.find_one({"uid": uid})
+            usr = users.find_one({"uid": user.uid})
 
             if not usr:
                 users.insert_one({
