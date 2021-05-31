@@ -327,7 +327,7 @@ class Processing:
             # 잘 포장해서 보낸다
             if len(meal) != 0:  # 급식이 존재할 때
                 meal_text = ''
-                for menu in db_meal:
+                for menu in meal:
                     meal_text = meal_text + menu + '\n'
                 meal_text = meal_text.rstrip()
 
@@ -374,7 +374,7 @@ class Processing:
                     # FS에 급식을 세이브한다.
                     me = {
                         'meal_id': meal_id,
-                        'meal': db_meal,
+                        'meal': meal,
                         'school_code': school_code,
                         'school_name': sch.name,
                         'date': tmp_date,
