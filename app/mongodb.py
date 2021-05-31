@@ -82,22 +82,18 @@ class MongoController:
     @staticmethod
     def save_meal(user, meal):
         from app.log import Logger
-        Logger.log('save_meal 진입.', 'INFO')
         try:
-            Logger.log('fuck.', 'INFO')
-            Logger.log(f'{user}, {meal}', 'INFO')
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
-            Logger.log(f'{user}, {meal}', 'INFO')
 
             meals = db.meals
-            Logger.log(f', {meals}', 'INFO')
 
             m = meals.find_one({"meal_id": meal['meal_id']})
-            Logger.log(f'{m}', 'INFO')
 
             if not m:
-                result = meals.insert_one(meal).inserted_id
-                Logger.log(f'{result}', 'INFO')
+                meals.insert_one(meal)
+                Logger.log('[DB > save_meal] 급식 저장 완료!', 'INFO')
+            else:
+                Logger.log('[DB > save_meal] 급식 저장 건너뜁니다... (동시 실행)!', 'WARN')
 
             return True
 

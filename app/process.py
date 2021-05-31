@@ -301,16 +301,16 @@ class Processing:
 
             db_meal = db.search_meal(school_code, tmp_date, mealtime)
             if db_meal:  # 디비에서 저장된 급식을 가져왔을 때
-                db_meal = db_meal['meal']
+                meal = db_meal['meal']
                 meal_id = db_meal['meal_id']
                 nutrition = db_meal['nutrition']
             else:   # 디비에 없을때
                 meal_id = '#{0}{1}'.format(user.uid, user.use_count)
                 try:
-                    db_meal, nutrition = sch.get_meal(date, int(mealtime))
+                    meal, nutrition = sch.get_meal(date, int(mealtime))
                 except TypeError:
                     # 급식이 없음
-                    db_meal = []
+                    meal = []
                     nutrition = None
                 except Exception as e:
                     Logger.log('[PS > process_postback] 급식 조회 중 오류!', 'ERROR', str(e))
@@ -325,7 +325,7 @@ class Processing:
                 mt_text = '점심'
 
             # 잘 포장해서 보낸다
-            if len(db_meal) != 0:  # 급식이 존재할 때
+            if len(meal) != 0:  # 급식이 존재할 때
                 meal_text = ''
                 for menu in db_meal:
                     meal_text = meal_text + menu + '\n'
@@ -381,7 +381,6 @@ class Processing:
                         'mealtime': int(mealtime),
                         'nutrition': nutrition
                     }
-                    Logger.log(f'call save_meal!', 'INFO')
                     db.save_meal(user, me)
 
                 return user
