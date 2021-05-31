@@ -82,7 +82,7 @@ class MongoController:
     @staticmethod
     def save_meal(user, meal):
         try:
-            meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
+            # meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
             from app.log import Logger
             Logger.log('[DB > save_meal] 급식: {0}'.format(meal))
