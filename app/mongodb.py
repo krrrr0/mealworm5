@@ -84,6 +84,9 @@ class MongoController:
         try:
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
+            from app.log import Logger
+            Logger.log('[DB > save_meal] 급식: {0}'.format(meal), 'ERROR', '')
+
             meals = db.meals
             # m = meals.find_one({"meal_id": meal['meal_id']})
             #if not m:
