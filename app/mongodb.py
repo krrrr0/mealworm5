@@ -81,13 +81,19 @@ class MongoController:
 
     @staticmethod
     def save_meal(user, meal):
+        print('진입.')
         try:
+            print('fuck')
+            print(user, meal)
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
             meals = db.meals
+            print(meals)
             m = meals.find_one({"meal_id": meal['meal_id']})
+            print(m)
             if not m:
-                meals.insert_one(meal)
+                result = meals.insert_one(meal).inserted_id
+                print(result)
             return True
 
         except Exception as e:
