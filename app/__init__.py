@@ -78,6 +78,8 @@ def old_deprecated():
                         if j.get('error'):
                             Logger.log('[APP > old] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
 
+                        break
+
         except Exception as e:
             print('Fuck: {}'.format(str(e)))
 
