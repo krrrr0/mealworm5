@@ -96,7 +96,7 @@ def webhook():
 
     if request.method == 'POST':
         try:
-            fs = FireStoreController()
+            fs = MongoController()
 
             req = request.get_json()
 
@@ -131,7 +131,7 @@ def webhook():
                                 )
                             except Exception as e:
                                 Logger.log(
-                                    'Firestore 유저 세이브 중 오류 발생: {0}'.format(str(e)),
+                                    '[INIT] DB 유저 세이브 중 오류 발생: {0}'.format(str(e)),
                                     'ERROR',
                                     'RECIPIENT: {0}'.format(usr.uid)
                                 )
@@ -151,7 +151,7 @@ def webhook():
                                     )
                                 except Exception as e:
                                     Logger.log(
-                                        'Firestore 유저 세이브 중 오류 발생: {0}'.format(str(e)),
+                                        'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
                                         'ERROR',
                                         'RECIPIENT: {0}'.format(usr.uid)
                                     )
@@ -171,7 +171,7 @@ def webhook():
 
                             except Exception as e:
                                 Logger.log(
-                                    'Firestore 유저 세이브 중 오류 발생: {0}'.format(str(e)),
+                                    'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
                                     'ERROR',
                                     'RECIPIENT: {0}'.format(usr.uid)
                                 )
@@ -189,7 +189,7 @@ def webhook():
                         )
                     except Exception as e:
                         Logger.log(
-                            'Firestore 유저 세이브 중 오류 발생: {0}'.format(str(e)),
+                            'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
                             'ERROR',
                             'RECIPIENT: {0}'.format(usr.uid)
                         )
