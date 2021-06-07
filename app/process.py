@@ -333,7 +333,7 @@ class Processing:
 
                 # 랜덤으로 보내기
                 from random import randint
-                rand_num = randint(0, 14)
+                rand_num = randint(0, 13)
 
                 if rand_num == 0:
                     fm.send(
@@ -353,10 +353,9 @@ class Processing:
                         '오다가 까먹을 뻔했어요',
                         '훗',
                         '오다가 주웠어요',
-                        '냠냠',
+                        '놈놈놈',
                         '맛있게 드세요',
-                        '졸려...',
-                        '급식봇 페이지 좋아요를 부탁드립니다!\nhttps://fb.me/mealworm05'
+                        '졸려...'
                     ]
                     fm.send(user.uid, msg_str[rand_num])
 
