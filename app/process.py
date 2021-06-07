@@ -333,7 +333,7 @@ class Processing:
 
                 # 랜덤으로 보내기
                 from random import randint
-                rand_num = randint(0, 13)
+                rand_num = randint(0, 10)
 
                 if rand_num == 0:
                     fm.send(
@@ -344,18 +344,15 @@ class Processing:
                     msg_str = [
                         '',         # 0
                         '이 냄새는 바로!',
-                        '반찬 남기지 마세요!',
-                        '귀찮다고...',
+                        '반찬 남기지 마세요',
                         '골고루 드세요',
-                        '흐흐흐...',
-                        '후후후...',
+                        '후후...',
                         '어디서 주웠어요.',
-                        '오다가 까먹을 뻔했어요',
+                        '오다가 잊어버릴 뻔했어요',
                         '훗',
                         '오다가 주웠어요',
-                        '놈놈놈',
-                        '맛있게 드세요',
-                        '졸려...'
+                        '냠냠',
+                        '맛있게 드세요'
                     ]
                     fm.send(user.uid, msg_str[rand_num])
 
@@ -426,7 +423,7 @@ class Processing:
 
                 return user
             else:  # 디비에 없을때
-                fm.send(user.uid, '죄송해요, DB에서 급식의 영양소 정보를 찾을 수 없었어요.', Templates.QuickReplies.after_system_error)
+                fm.send(user.uid, '죄송합니다, DB에서 급식의 영양소 정보를 찾을 수 없었어요.', Templates.QuickReplies.after_system_error)
                 return user
 
         elif payload == 'BUGREPORT':
