@@ -84,6 +84,7 @@ class FacebookMessenger:
             body['message']['quick_replies'] = quick_replies
 
         response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=2)
+        # Send에는 위 HACK을 적용하지 마세요!
 
         j = response.json()
         if j.get('error'):
