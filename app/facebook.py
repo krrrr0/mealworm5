@@ -32,15 +32,19 @@ class FacebookMessenger:
             body = {'recipient': {'id': uid}, 'sender_action': 'typing_on'}
 
             # 보낸다
-            response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
+            response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers,
+                                     timeout=0.01)  # HACK
 
             j = response.json()
             if j.get('error'):
                 from app.log import Logger
                 Logger.log('[FB > typing] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
+
+        except requests.exceptions.ReadTimeout:    # HACK: https://stackoverflow.com/a/45601591
+            pass
         except Exception as err:
             from app.log import Logger
-            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Likely Timeout).', 'ERROR', str(err))
+            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Timeout 제외)', 'ERROR', str(err))
         return
 
     def send(self, recipient, thing, quick_replies=None):
