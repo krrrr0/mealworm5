@@ -39,9 +39,10 @@ class FacebookMessenger:
             # The reason why this works, is because you don't need response from the Graph Api.
             # So, we could both save time and prevent slow Graph Api responses from slowing down the app.
             pass
+
         except Exception as err:
             from app.log import Logger
-            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Timeout 제외)', 'ERROR', str(err))
+            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Likely Timeout).', 'ERROR', str(err))
         return
 
     def send(self, recipient, thing, quick_replies=None):
