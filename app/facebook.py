@@ -32,17 +32,19 @@ class FacebookMessenger:
             body = {'recipient': {'id': uid}, 'sender_action': 'typing_on'}
 
             # 보낸다
-            requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers,
-                          timeout=0.01)  # HACK
+            response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers,
+                                     timeout=0.01)  # HACK
+
+            j = response.json()
+            if j.get('error'):
+                from app.log import Logger
+                Logger.log('[FB > typing] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
 
         except requests.exceptions.ReadTimeout:    # HACK: https://stackoverflow.com/a/45601591
-            # The reason why this works, is because you don't need response from the Graph Api.
-            # So, we could both save time and prevent slow Graph Api responses from slowing down the app.
             pass
-
         except Exception as err:
             from app.log import Logger
-            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Likely Timeout).', 'ERROR', str(err))
+            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Timeout 제외)', 'ERROR', str(err))
         return
 
     def send(self, recipient, thing, quick_replies=None):
@@ -81,14 +83,13 @@ class FacebookMessenger:
         elif quick_replies:
             body['message']['quick_replies'] = quick_replies
 
-        try:
-            requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=2)
-        except requests.exceptions.ReadTimeout:    # HACK: https://stackoverflow.com/a/45601591
-            # We don't need response data from Graph Api.
-            pass
-        except Exception as err:
+        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=2)
+
+        j = response.json()
+        if j.get('error'):
             from app.log import Logger
-            Logger.log('[FB > send] 그래프 API 요청중 내부 오류 (Timeout 제외)', 'ERROR', str(err))
+            Logger.log('[FB > send] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
+
         return
 
 
