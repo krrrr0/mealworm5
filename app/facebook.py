@@ -26,18 +26,21 @@ class FacebookMessenger:
         return
 
     def typing(self, uid):
-        # 바디 / 헤더
-        headers = {'content-type': 'application/json'}
-        body = {'recipient': {'id': uid}, 'sender_action': 'typing_on'}
+        try:
+            # 바디 / 헤더
+            headers = {'content-type': 'application/json'}
+            body = {'recipient': {'id': uid}, 'sender_action': 'typing_on'}
 
-        # 보낸다
-        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
+            # 보낸다
+            response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
 
-        j = response.json()
-        if j.get('error'):
+            j = response.json()
+            if j.get('error'):
+                from app.log import Logger
+                Logger.log('[FB > typing] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
+        except Exception as err:
             from app.log import Logger
-            Logger.log('[FB > typing] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
-
+            Logger.log('[FB > typing] 그래프 API 요청중 내부 오류 (Likely Timeout).', 'ERROR', str(err))
         return
 
     def send(self, recipient, thing, quick_replies=None):
@@ -76,7 +79,7 @@ class FacebookMessenger:
         elif quick_replies:
             body['message']['quick_replies'] = quick_replies
 
-        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
+        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=2)
 
         j = response.json()
         if j.get('error'):
@@ -102,8 +105,13 @@ class Graph:
         url = 'https://graph.facebook.com/v7.0/%s?fields=first_name,last_name&access_token=%s' \
               % (uid, self.config['FACEBOOK']['ACCESS_TOKEN'])
 
-        resp = requests.get(url, timeout=1.5)
-        resp_json = resp.json()
+        try:
+            resp = requests.get(url, timeout=3)
+            resp_json = resp.json()
+        except Exception as err:
+            from app.log import Logger
+            Logger.log('[GP > get_name] 그래프 API 요청중 내부 오류 (Likely Timeout -> 3s).', 'ERROR', str(err))
+            return '유저{0}'.format(uid)
 
         if resp_json.get('error'):
             from app.log import Logger
