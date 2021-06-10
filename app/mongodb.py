@@ -6,10 +6,6 @@ from app.user import User
 from pymongo import MongoClient
 
 
-client = MongoClient()
-db = client['mealworm5']
-
-
 class MongoController:
     @staticmethod
     def get_user(uid, g_config):
@@ -19,6 +15,8 @@ class MongoController:
         :param uid: User ID (Recipient ID)
         :return: User Object (없으면 None)
         """
+        client = MongoClient()
+        db = client['mealworm5']
         users = db.users
 
         usr = users.find_one({"uid": uid})
@@ -39,6 +37,8 @@ class MongoController:
 
     @staticmethod
     def save_user(user):
+        client = MongoClient()
+        db = client['mealworm5']
         users = db.users
         usr = users.find_one({"uid": user.uid})
 
@@ -69,6 +69,8 @@ class MongoController:
         try:
             meal['created_date'] = datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y-%m-%d-%H-%M-%S')
 
+            client = MongoClient()
+            db = client['mealworm5']
             meals = db.meals
 
             m = meals.find_one({"meal_id": meal['meal_id']})
@@ -89,6 +91,8 @@ class MongoController:
     @staticmethod
     def search_meal(school_code, date, mealtime):
         try:
+            client = MongoClient()
+            db = client['mealworm5']
             meals = db.meals
             meal = meals.find_one({
                 '$and': [
@@ -112,6 +116,8 @@ class MongoController:
     @staticmethod
     def get_meal(meal_id):
         try:
+            client = MongoClient()
+            db = client['mealworm5']
             meals = db.meals
             meal = meals.find_one({"meal_id": meal_id})
             if meal:
@@ -127,6 +133,8 @@ class MongoController:
     @staticmethod
     def save_bugreport(uid, title, details, contact):
         try:
+            client = MongoClient()
+            db = client['mealworm5']
             bugs = db.bugs
             bugs.insert_one({
                 'report_id': '{0}_{1}'.format(
