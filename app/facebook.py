@@ -81,7 +81,7 @@ class FacebookMessenger:
             body['message']['quick_replies'] = quick_replies
 
         try:
-            requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=0.01)
+            requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=2)
         except requests.exceptions.ReadTimeout:    # HACK: https://stackoverflow.com/a/45601591
             # We don't need response data from Graph Api.
             pass
