@@ -23,7 +23,7 @@ class NEIS:
             'SCHUL_NM': str(query)
         }
 
-        response = requests.request('GET', url, data='', headers={}, params=querystring)
+        response = requests.request('GET', url, data='', headers={}, params=querystring, timeout=1.5)
         data = response.json()
 
         if data.get('RESULT', {}).get('CODE') == 'INFO-200':
@@ -61,7 +61,7 @@ class NEIS:
             'SD_SCHUL_CODE': code.split('+')[1]
         }
 
-        response = requests.request('GET', url, data='', headers={}, params=querystring)
+        response = requests.request('GET', url, data='', headers={}, params=querystring, timeout=1.5)
         data = response.json()
 
         if data.get('RESULT', {}).get('CODE') == 'INFO-200':
@@ -116,7 +116,7 @@ class NEIS:
             payload = ''
             headers = {}
 
-            response = requests.request('GET', url, data=payload, headers=headers, params=querystring)
+            response = requests.request('GET', url, data=payload, headers=headers, params=querystring, timeout=1.5)
             data = response.json()
 
             if data.get('RESULT', {}).get('CODE') == 'INFO-200':

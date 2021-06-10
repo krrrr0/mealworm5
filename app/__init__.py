@@ -71,7 +71,8 @@ def old_deprecated():
                             'https://graph.facebook.com/v7.0/me/messages?access_token=' +
                             g_config['FACEBOOK']['OLD_ACCESS_TOKEN'],
                             data=json.dumps(body),
-                            headers=headers
+                            headers=headers,
+                            timeout=1.5
                         )
 
                         j = response.json()

@@ -31,7 +31,7 @@ class FacebookMessenger:
         body = {'recipient': {'id': uid}, 'sender_action': 'typing_on'}
 
         # 보낸다
-        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers)
+        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
 
         j = response.json()
         if j.get('error'):
@@ -76,7 +76,7 @@ class FacebookMessenger:
         elif quick_replies:
             body['message']['quick_replies'] = quick_replies
 
-        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers)
+        response = requests.post(self.endpoint + self.access_token, data=json.dumps(body), headers=headers, timeout=1.5)
 
         j = response.json()
         if j.get('error'):
@@ -102,7 +102,7 @@ class Graph:
         url = 'https://graph.facebook.com/v7.0/%s?fields=first_name,last_name&access_token=%s' \
               % (uid, self.config['FACEBOOK']['ACCESS_TOKEN'])
 
-        resp = requests.get(url)
+        resp = requests.get(url, timeout=1.5)
         resp_json = resp.json()
 
         if resp_json.get('error'):
