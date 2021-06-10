@@ -15,7 +15,6 @@ import json
 
 from app.process import Processing
 from app.mongodb import MongoController
-from app.facebook import FacebookMessenger
 from app.log import Logger
 from app.user import User
 
@@ -27,12 +26,13 @@ g_config.read('config.ini')
 app = Flask(__name__, static_url_path='/static')
 
 ps = Processing()
+db = MongoController()
 
 
 @app.route('/')
 def hello_world():
     # Make it Ra1n
-    Logger.log('Hello, world!', 'NOTICE', 'This is a test.')
+    Logger.log('Hello, world!', 'INFO', 'This is a test.')
     return '<code>Notice Me!</code>'
 
 
@@ -76,151 +76,145 @@ def old_deprecated():
 
                         j = response.json()
                         if j.get('error'):
-                            Logger.log('[APP > old] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
+                            Logger.log('[OLD] 그래프 API가 오류를 반환했습니다.', 'ERROR', response.text)
 
                         break
 
         except Exception as e:
             print('Fuck: {}'.format(str(e)))
 
-        Logger.log('Deprecated Request Processed.')
-        return 'Deprecated Request Processed.'
+        Logger.log('[OLD] Deprecated Request Processed.')
+        return {
+            'result': 'success',
+            'details': 'Successfully processed deprecated /old request.'
+        }
 
 
 @app.route('/webhook', methods=['GET', 'POST'])
 def webhook():
+    # Verification Test
     if request.method == 'GET':
-        # Verification Test
         if request.args.get('hub.verify_token') == g_config['FACEBOOK']['VERIFY_TOKEN']:
             return request.args.get('hub.challenge')
         else:
             return 'Verification Failed!'
 
+    # Messenger Callback
     if request.method == 'POST':
         try:
-            fs = MongoController()
-
             req = request.get_json()
-
             for event in req['entry']:
-                # 요청의 단위
                 for e in event['messaging']:
-                    # 0. 고스트 확인
+                    # 메시지 시작
+                    # 에코 메시지라면 스킵
                     if e.get('message', {}).get('is_echo'):
-                        break
+                        continue
 
-                    # 1. 디비에서 불러오기
-                    usr = fs.get_user(e['sender']['id'], g_config)
+                    # 1. 디비에서 사용자 정보 가져오기
+                    try:
+                        usr = db.get_user(e['sender']['id'], g_config)
+                    except Exception as err:
+                        Logger.log(f'[APP] db.get_user 오류', 'ERROR', str(err))
 
-                    # 0-1-1. 신규 유저인 경우
+                        from app.facebook import FacebookMessenger
+                        from app.template import Templates
+                        fm = FacebookMessenger(g_config)
+                        fm.send(e['sender']['id'], '데이터베이스 오류가 발생했습니다. 잠시 후 다시 이용해주세요.',
+                                Templates.QuickReplies.after_system_error)
+                        continue
+
+                    # 1.1. 신규 유저
                     if not usr:
-                        Logger.log('[APP > webhook] UID: {0} 생성합니다...'.format(e['sender']['id']))
-                        user_config = {
-                            'new_user': True,
-                            'uid': e['sender']['id']
-                        }
-                        usr = User(user_config, g_config)
+                        usr = User({'new_user': True, 'uid': e['sender']['id']}, g_config)
+                        Logger.log(f'[APP] 신규 유저: {usr.uid}', 'INFO')
 
-                    # 1-1. 포스트백 처리
-                    if e.get('postback'):
-                        if e['postback'].get('payload'):
-                            usr = ps.process_postback(usr, e['postback']['payload'], g_config)
-                            try:
-                                fs.save_user(usr)
-                                Logger.log(
-                                    '유저 세이브 완료: {0}'.format(usr.uid),
-                                    'NOTICE'
-                                )
-                            except Exception as e:
-                                Logger.log(
-                                    '[INIT] DB 유저 세이브 중 오류 발생: {0}'.format(str(e)),
-                                    'ERROR',
-                                    'RECIPIENT: {0}'.format(usr.uid)
-                                )
-                        break
+                    # 2. 포스트백 처리
+                    if e.get('postback', {}).get('payload'):
+                        usr = ps.process_postback(usr, e['postback']['payload'], g_config)
+                        try:
+                            db.save_user(usr)
+                            Logger.log(f'[APP] 포스트백 처리후 유저 {usr.uid} 세이브 완료.', 'INFO')
+                        except Exception as err:
+                            Logger.log(f'[APP] 포스트백 처리후 유저 {usr.uid} 세이브중 오류 발생!', 'ERROR', str(err))
 
-                    # 1-2. 메시지 처리
+                            from app.facebook import FacebookMessenger
+                            from app.template import Templates
+                            fm = FacebookMessenger(g_config)
+                            fm.send(e['sender']['id'], '데이터베이스 오류가 발생했습니다. 잠시 후 다시 이용해주세요.',
+                                    Templates.QuickReplies.after_system_error)
+                        continue
+
+                    # 3. 메시지 처리
                     elif e.get('message'):
-                        # 1-2-1. 빠른 답장 포스트백 처리
-                        if e['message'].get('quick_reply'):
-                            if e['message']['quick_reply'].get('payload'):
-                                usr = ps.process_postback(usr, e['message']['quick_reply']['payload'], g_config)
-                                try:
-                                    fs.save_user(usr)
-                                    Logger.log(
-                                        '유저 세이브 완료: {0}'.format(usr.uid),
-                                        'NOTICE'
-                                    )
-                                except Exception as e:
-                                    Logger.log(
-                                        'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
-                                        'ERROR',
-                                        'RECIPIENT: {0}'.format(usr.uid)
-                                    )
-                                break
+                        # 3.1. 빠른 답장 포스트백 처리
+                        if e['message'].get('quick_reply', {}).get('payload'):
+                            usr = ps.process_postback(usr, e['message']['quick_reply']['payload'], g_config)
+                            try:
+                                db.save_user(usr)
+                                Logger.log(f'[APP] 빠른 답장 처리후 유저 {usr.uid} 세이브 완료.', 'INFO')
+                            except Exception as err:
+                                Logger.log(f'[APP] 빠른 답장 처리후 유저 {usr.uid} 세이브중 오류 발생!', 'ERROR', str(err))
 
-                        # 1-2-2. 텍스트 메시지 처리
+                                from app.facebook import FacebookMessenger
+                                from app.template import Templates
+                                fm = FacebookMessenger(g_config)
+                                fm.send(e['sender']['id'], '데이터베이스 오류가 발생했습니다. 잠시 후 다시 이용해주세요.',
+                                        Templates.QuickReplies.after_system_error)
+                            continue
+
+                        # 3.2. 텍스트 메시지 처리
                         if e['message'].get('text'):
                             usr = ps.process_message(usr, e['message']['text'], g_config)
                             try:
-                                fs.save_user(usr)
-                                Logger.log(
-                                    '유저 세이브 완료: {0}'.format(usr.uid),
-                                    'NOTICE'
-                                )
-
+                                db.save_user(usr)
+                                Logger.log(f'[APP] 메시지 처리후 유저 {usr.uid} 세이브 완료.', 'INFO')
                                 # 최적화: 전날 급식 캐시 제거
+                            except Exception as err:
+                                Logger.log(f'[APP] 메시지 처리후 유저 {usr.uid} 세이브중 오류 발생!', 'ERROR', str(err))
 
-                            except Exception as e:
-                                Logger.log(
-                                    'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
-                                    'ERROR',
-                                    'RECIPIENT: {0}'.format(usr.uid)
-                                )
-                            break
+                                from app.facebook import FacebookMessenger
+                                from app.template import Templates
+                                fm = FacebookMessenger(g_config)
+                                fm.send(e['sender']['id'], '데이터베이스 오류가 발생했습니다. 잠시 후 다시 이용해주세요.',
+                                        Templates.QuickReplies.after_system_error)
+                            continue
 
                         # 1-2-3. 첨부파일 등이 있는 메시지
                         if e['message'].get('attachments'):
                             ps.process_postback(usr, 'ATTACHMENTS', g_config)
-                            break
+                            continue
 
                     try:
-                        fs.save_user(usr)
-                        Logger.log(
-                            '유저 세이브 완료: {0}'.format(usr.uid),
-                            'NOTICE'
-                        )
-                    except Exception as e:
-                        Logger.log(
-                            'Mongo 유저 세이브 중 오류 발생: {0}'.format(str(e)),
-                            'ERROR',
-                            'RECIPIENT: {0}'.format(usr.uid)
-                        )
+                        db.save_user(usr)
+                        Logger.log(f'[APP] 처리 없이 유저 {usr.uid} 세이브 완료.', 'INFO')
+                    except Exception as err:
+                        Logger.log(f'[APP] 처리 없이 유저 {usr.uid} 세이브중 오류 발생!', 'ERROR', str(err))
 
-            return {'result': 'fuck yeah!'}
+                        from app.facebook import FacebookMessenger
+                        from app.template import Templates
+                        fm = FacebookMessenger(g_config)
+                        fm.send(e['sender']['id'], '데이터베이스 오류가 발생했습니다. 잠시 후 다시 이용해주세요.',
+                                Templates.QuickReplies.after_system_error)
 
-        except Exception as e:
+            return {'result': 'success'}
+
+        except Exception as err:
             traceback.print_exc()
-            return {}
+            Logger.log(f'[APP] 알 수 없는 치명적 오류 발생!', 'ERROR', str(err))
 
             try:
-                Logger.log('치명적 오류 발생!! RECIPIENT: {0}'.format(e['sender']['id']), level='ERROR', details=str(e))
-
+                from app.facebook import FacebookMessenger
+                from app.template import Templates
                 fm = FacebookMessenger(g_config)
-                fm.send(
-                    e['sender']['id'],
-                    '죄송합니다, 급식봇에 처리되지 않은 오류가 발생했습니다.\n'
-                    '일시적인 오류인 경우, 다시 시도해 주세요. 계속적으로 오류가 발생하는 경우, '
-                    '아래의 \'버그 신고하기\' 기능을 이용해 신고해 주세요.\n%s' % str(e)
-                )
-
-            except Exception:
-                # 유언 못남김
+                fm.send(e['sender']['id'],
+                        f'죄송합니다, 급식봇에 처리되지 않은 오류가 발생했습니다.\n'
+                        f'다시 시도해 주시고, 계속 오류가 발생할 경우 아래 \'버그 신고하기\' '
+                        f'기능을 통해서 신고해 주세요.{str(err)}',
+                        Templates.QuickReplies.after_system_error)
+            except:
                 pass
 
-            return {
-                'result': 'screwed'
-            }
+            return {'result': 'error'}  # 오류시에도 200 리턴
 
 
 @app.route('/support/bugreport', methods=['GET', 'POST'])
@@ -253,5 +247,5 @@ def bugreport():
         except (KeyError, ValueError):
             return render_template('bad.html', details='잘못된 접근이에요.')
 
-        except Exception as e:
-            return render_template('bad.html', details='처리되지 않은 오류입니다: ' + str(e))
+        except Exception as err:
+            return render_template('bad.html', details='처리되지 않은 오류입니다: ' + str(err))

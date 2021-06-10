@@ -22,7 +22,7 @@ class DialogFlowController:
         response = session_client.detect_intent(
             session=session, query_input=query_input)
 
-        Logger.log('[DF > get_intent] Dialogflow API 처리 완료!', 'NOTICE', '요청 query: %s' % query)
+        Logger.log('[DF > get_intent] 인텐트 분석 완료.', 'INFO', '쿼리: %s' % query)
 
         entities = {}
         for e in response.query_result.parameters.fields:

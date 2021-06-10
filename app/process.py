@@ -4,7 +4,9 @@ from app.template import Templates
 import datetime
 import pytz
 
+from app.facebook import FacebookMessenger
 from app.mongodb import MongoController
+
 db = MongoController()
 
 
@@ -14,18 +16,18 @@ class Processing:
 
     def process_message(self, user, req_str, g_config):
         # 1. 오브젝트 만들기
-        from app.facebook import FacebookMessenger
+
         fm = FacebookMessenger(g_config)
         fm.typing(user.uid)
 
         from app.log import Logger
-        Logger.log('[PS > process_message] 요청: {0}->\'{1}\''.format(user.uid, req_str))
+        Logger.log('[PS > process_message] 메시지 처리 시작: {0} -> \'{1}\''.format(user.uid, req_str))
 
         # 이스터 에그
         if req_str.strip() == '올때 메로나':
             fm.send(
                 user.uid,
-                '응 아니야',
+                'ㅇㅇㄴㅇ',
                 Templates.QuickReplies.after_action
             )
             return user
@@ -33,7 +35,7 @@ class Processing:
         if '섹스' in req_str:
             fm.send(
                 user.uid,
-                '잠시 일상을 내려놓고 자신을 돌아보는 시간을 가지는 것은 어떨까요?',
+                '시발 진짜 세상 살기 힘드네',
                 Templates.QuickReplies.after_user_error
             )
             return user
@@ -333,7 +335,7 @@ class Processing:
 
                 # 랜덤으로 보내기
                 from random import randint
-                rand_num = randint(0, 10)
+                rand_num = randint(0, 11)
 
                 if rand_num == 0:
                     fm.send(
@@ -346,12 +348,13 @@ class Processing:
                         '이 냄새는 바로!',
                         '반찬 남기지 마세요',
                         '골고루 드세요',
-                        '후후...',
+                        '헤헷',
                         '어디서 주웠어요.',
                         '오다가 잊어버릴 뻔했어요',
                         '훗',
                         '오다가 주웠어요',
-                        '냠냠',
+                        '히힛',
+                        '맛나게 드십쇼',
                         '맛있게 드세요'
                     ]
                     fm.send(user.uid, msg_str[rand_num])

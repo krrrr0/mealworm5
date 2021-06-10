@@ -8,8 +8,8 @@ class Logger:
         return
 
     @staticmethod
-    def log(payload, level='NOTICE', details=''):
-        # Three log levels: NOTICE, WARN, ERROR
+    def log(payload, level='INFO', details=''):
+        # Three log levels: INFO, WARN, ERROR
         # TODO: Timestamp
         # TODO: Make It Async
         print('[{0}] [{1}] {2} {3}'.format(datetime.datetime.now(pytz.timezone('Asia/Seoul')).strftime('%Y%m%d-%H%M%S'),
@@ -19,7 +19,7 @@ class Logger:
                 logging.error(payload + details)
             elif level == 'WARN':
                 logging.warning(payload + details)
-            elif level == 'NOTICE':
+            elif level == 'INFO':
                 logging.info(payload + details)
         except Exception as e:
             logging.error('[Logger > log] 로깅 중 오류가 발생하였습니다: {0}'.format(e))

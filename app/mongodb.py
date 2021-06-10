@@ -21,61 +21,45 @@ class MongoController:
         """
         users = db.users
 
-        try:
-            usr = users.find_one({"uid": uid})
+        usr = users.find_one({"uid": uid})
+        if usr:
+            return User({
+                'uid': uid,
+                'new_user': False,
+                'user_details': {
+                    'name': usr['name'],
+                    'use_count': usr['use_count'],
+                    'since': datetime.datetime.strptime(usr['since'], '%Y-%m-%d-%H-%M-%S')
+                },
+                'last_school_code': usr['last_school_code']
+            }, g_config)
 
-            if usr:
-                user_config = {
-                    'uid': uid,
-                    'new_user': False,
-                    'user_details': {
-                        'name': usr['name'],
-                        'use_count': usr['use_count'],
-                        'since': datetime.datetime.strptime(usr['since'], '%Y-%m-%d-%H-%M-%S')
-                    },
-                    'last_school_code': usr['last_school_code']
-                }
-
-                return User(user_config, g_config)
-            else:
-                from app.log import Logger
-                Logger.log('[DB > get_user] 신규 유저 | UID: {0}'.format(uid), 'INFO')
-                return None
-
-        except Exception as e:
-            from app.log import Logger
-            Logger.log('[DB > get_user] 유저 조회 실패.'.format(uid), 'WARN', str(e))
+        else:
             return None
 
     @staticmethod
     def save_user(user):
-        try:
-            users = db.users
-            usr = users.find_one({"uid": user.uid})
+        users = db.users
+        usr = users.find_one({"uid": user.uid})
 
-            if not usr:
-                users.insert_one({
-                    'uid': user.uid,
-                    'name': user.name,
-                    'use_count': user.use_count,
-                    'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
-                    'last_school_code': user.last_school_code
-                })
-            else:
-                users.replace_one({
-                    'uid': user.uid
-                }, {
-                    'uid': user.uid,
-                    'name': user.name,
-                    'use_count': user.use_count,
-                    'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
-                    'last_school_code': user.last_school_code
-                })
-
-        except Exception as e:
-            from app.log import Logger
-            Logger.log('[DB > save_user] 유저 저장 실패. UID: {0}'.format(user.uid), 'ERROR', str(e))
-            return None
+        if not usr:
+            users.insert_one({
+                'uid': user.uid,
+                'name': user.name,
+                'use_count': user.use_count,
+                'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
+                'last_school_code': user.last_school_code
+            })
+        else:
+            users.replace_one({
+                'uid': user.uid
+            }, {
+                'uid': user.uid,
+                'name': user.name,
+                'use_count': user.use_count,
+                'since': user.since.strftime('%Y-%m-%d-%H-%M-%S'),
+                'last_school_code': user.last_school_code
+            })
 
         return True
 
